@@ -9,11 +9,18 @@ class Vol3Suite < Formula
   depends_on "python@3.12"
 
   def install
-    bin.install "vol3_suite/cli.py" => "vol3-suite"
+    libexec.install Dir["*"]
+    (bin/"vol3-suite").write <<~EOS
+      #!/bin/bash
+      export PYTHONPATH="#{libexec}:$PYTHONPATH"
+      exec python3 -m vol3_suite.cli "$@"
+    EOS
     bin.install_symlink "vol3-suite" => "vol-ai-triage"
+    bin.install_symlink "vol3-suite" => "ebpf-detector"
   end
 
   test do
     system bin/"vol3-suite", "--help"
+    system bin/"vol-ai-triage", "--help"
   end
 end
